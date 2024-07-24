@@ -1,21 +1,20 @@
 'use client'
 
 import React, { useState, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import { addTodo } from '@/store/todoSlice';
 
-type TodoInputProps = {
-  onAddTodo: (todo: string) => void;
-};
-
-const TodoInput: React.FC<TodoInputProps> = ({ onAddTodo }) => {
+const TodoInput: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>('');
+  const dispatch = useDispatch();
 
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      onAddTodo(inputValue.trim());
+      dispatch(addTodo(inputValue.trim()));
       setInputValue('');
     }
-  }, [inputValue, onAddTodo]);
+  }, [inputValue, dispatch]);
 
   return (
     <form onSubmit={handleSubmit} className="flex justify-center gap-4 p-6">

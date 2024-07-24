@@ -1,20 +1,19 @@
 'use client'
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { ArrowUpCircle, Check, Pencil } from 'lucide-react';
-import { Todo } from './todoReducer';
+import { Todo, toggleTodo, editTodo, removeTodo } from '@/store/todoSlice';
 
 type TodoItemProps = {
   todo: Todo;
-  onToggle: (id: number) => void;
-  onEdit: (id: number, newTodo: string) => void;
-  onRemove: (id: number) => void;
 };
 
-const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onEdit, onRemove }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(todo.todo);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -24,12 +23,12 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onEdit, onRemove })
 
   const handleEdit = useCallback(() => {
     if (editValue.trim() !== '') {
-      onEdit(todo.id, editValue.trim());
+      dispatch(editTodo({ id: todo.id, todo: editValue.trim() }));
       setIsEditing(false);
     } else {
-      onRemove(todo.id);
+      dispatch(removeTodo(todo.id));
     }
-  }, [editValue, onEdit, onRemove, todo.id]);
+  }, [editValue, dispatch, todo.id]);
 
   if (isEditing) {
     return (
@@ -75,14 +74,14 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onEdit, onRemove })
           <Pencil className="w-[15px]" />
         </button>
         <button
-          onClick={() => onRemove(todo.id)}
+          onClick={() => dispatch(removeTodo(todo.id))}
           className="rounded-full bg-red-500 hover:bg-red-600 h-8 w-8 flex items-center justify-center"
           aria-label="Remove todo"
         >
           X
         </button>
         <button
-          onClick={() => onToggle(todo.id)}
+          onClick={() => dispatch(toggleTodo(todo.id))}
           className="flex items-center justify-center text-[20px] rounded-full bg-violet-500 hover:bg-violet-600 h-8 w-8"
           aria-label={todo.done ? "Mark as undone" : "Mark as done"}
         >
